@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel TV Masjid</title>
+    <style>
+        :root { --primary: #2aa198; --dark: #073642; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f4; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: var(--dark); margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        
+        label { font-weight: bold; display: block; margin-top: 15px; font-size: 14px; color: #666; }
+        input, textarea { 
+            width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; 
+            border-radius: 8px; box-sizing: border-box; font-size: 16px;
+        }
+        textarea { resize: vertical; }
+        
+        .btn-update { 
+            background: var(--primary); color: white; border: none; padding: 15px; 
+            width: 100%; border-radius: 8px; font-size: 18px; font-weight: bold; 
+            cursor: pointer; margin-top: 25px; transition: 0.3s;
+        }
+        .btn-update:hover { background: #23867f; }
+        
+        .info-box { 
+            background: #e0f2f1; padding: 10px; border-radius: 8px; 
+            margin-top: 20px; font-size: 12px; line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Update TV Masjid</h2>
+    
+    <label>Nama Masjid</label>
+    <input type="text" id="nama_masjid" placeholder="Contoh: Masjid Al-Ikhlas">
+
+    <label>Alamat / Lokasi</label>
+    <input type="text" id="alamat" placeholder="Jl. Sudirman No. 123...">
+
+    <label>Pengumuman (Running Text)</label>
+    <textarea id="pengumuman" rows="4" placeholder="Ketik pengumuman di sini..."></textarea>
+
+    <label>URL Gambar Slideshow (Pisahkan dengan koma)</label>
+    <textarea id="slides" rows="3" placeholder="https://link-gambar1.jpg, https://link-gambar2.jpg"></textarea>
+
+    <button class="btn-update" onclick="simpanData()">UPDATE TAMPILAN TV</button>
+
+    <div class="info-box">
+        <strong>Tips:</strong> Data yang Anda simpan di sini akan langsung berubah di layar TV tanpa perlu merestart browser TV.
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+    // PASTI-KAN CONFIG INI SAMA DENGAN DI FILE INDEX.HTML TV
+    const firebaseConfig = {
+        databaseURL: "ISI_DENGAN_URL_FIREBASE_ANDA"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Ambil data lama saat halaman dibuka agar tidak mengetik ulang
+    const kontenRef = ref(db, 'konten/');
+    onValue(kontenRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            document.getElementById('nama_masjid').value = data.nama_masjid || "";
+            document.getElementById('alamat').value = data.alamat || "";
+            document.getElementById('pengumuman').value = data.pengumuman || "";
+            document.getElementById('slides').value = data.slides || "";
+        }
+    });
+
+    // Fungsi Simpan
+    window.simpanData = function() {
+        const nama = document.getElementById('nama_masjid').value;
+        const alamat = document.getElementById('alamat').value;
+        const teks = document.getElementById('pengumuman').value;
+        const gambar = document.getElementById('slides').value;
+
+        set(ref(db, 'konten/'), {
+            nama_masjid: nama,
+            alamat: alamat,
+            pengumuman: teks,
+            slides: gambar
+        })
+        .then(() => {
+            alert("✅ Berhasil dikirim ke TV!");
+        })
+        .catch((error) => {
+            alert("❌ Gagal: " + error.message);
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart TV Masjid - Modern & Live</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS RESET & BASE */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: #1a2a3a; 
+            color: #ecf0f1; 
+            overflow: hidden; height: 100vh; 
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* CONTAINER UTAMA */
+        .container {
+            display: grid;
+            grid-template-rows: 15vh 85vh;
+            height: 98vh; width: 98vw;
+            background: #2c3e50;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* HEADER */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 50px; 
+            background: linear-gradient(90deg, #1c2c3c, #2a3c4e);
+            border-bottom: 5px solid #f39c12;
+        }
+        .header-left { display: flex; align-items: center; gap: 25px; }
+        .logo { height: 10vh; border-radius: 50%; box-shadow: 0 0 15px rgba(243, 156, 18, 0.4); }
+        .nama-masjid h1 { 
+            font-family: 'Oswald', sans-serif; font-size: 5.5vh; 
+            color: #f39c12; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .nama-masjid p { font-size: 2.2vh; opacity: 0.7; margin-top: -5px; }
+        #jam-digital { 
+            font-family: 'Oswald', sans-serif; font-size: 9vh; 
+            font-weight: 600; color: #3498db; 
+        }
+
+        /* MAIN CONTENT */
+        main { display: flex; padding: 20px; gap: 20px; background: #2c3e50; flex: 1; }
+        
+        .main-left { flex: 2.5; display: flex; flex-direction: column; gap: 20px; }
+
+        .slideshow-container {
+            flex-grow: 1; background: #000; border-radius: 15px;
+            overflow: hidden; position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .slide {
+            width: 100%; height: 100%; object-fit: cover;
+            position: absolute; opacity: 0; transition: opacity 1.2s ease-in-out;
+        }
+        .slide.active { opacity: 1; }
+
+        .main-footer {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            border-radius: 15px; height: 8vh;
+            display: flex; align-items: center; font-size: 3.5vh; 
+            white-space: nowrap; overflow: hidden; padding: 0 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); font-weight: 600;
+        }
+
+        /* SIDEBAR JADWAL */
+        .jadwal-sidebar {
+            flex: 1; display: flex; flex-direction: column; gap: 12px;
+            background: #34495e; border-radius: 15px; padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .jadwal-sidebar h2 {
+            font-family: 'Oswald', sans-serif; font-size: 4vh;
+            text-align: center; color: #f39c12; margin-bottom: 10px;
+            border-bottom: 2px solid rgba(243, 156, 18, 0.4);
+        }
+        .kartu-sholat {
+            background: rgba(255, 255, 255, 0.08); padding: 2vh 20px; 
+            border-radius: 12px; display: flex; justify-content: space-between; align-items: center;
+            border-left: 8px solid #2ecc71; transition: all 0.3s ease;
+        }
+        .kartu-sholat.active { 
+            background: #f39c12; border-left-color: #e67e22; 
+            animation: pulse 1.5s infinite; color: #2c3e50; 
+        }
+        .kartu-sholat.active span { color: #2c3e50; }
+        .kartu-sholat.active b { color: #fff; }
+        .kartu-sholat span { font-size: 3vh; font-weight: 400; color: #ecf0f1; }
+        .kartu-sholat b { font-family: 'Oswald', sans-serif; font-size: 4vh; color: #3498db; }
+
+        /* OVERLAY ADZAN */
+        #overlay-adzan {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); z-index: 100;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .adzan-card {
+            background: #2c3e50; border: 6px solid #f39c12; border-radius: 25px;
+            padding: 50px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+        }
+        #timer-countdown { font-family: 'Oswald', sans-serif; font-size: 22vh; color: #3498db; line-height: 1; }
+        .msg-judul { font-family: 'Oswald', sans-serif; font-size: 7vh; color: #ecf0f1; margin-bottom: 10px; }
+        .msg-sholat { font-size: 6vh; color: #f39c12; font-weight: 600; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <img src="https://cdn-icons-png.flaticon.com/512/1864/1864639.png" class="logo">
+                <div class="nama-masjid">
+                    <h1 id="txt-nama-masjid">MEMUAT...</h1>
+                    <p id="txt-alamat">Sinkronisasi data...</p>
+                </div>
+            </div>
+            <div id="jam-digital">00:00:00</div>
+        </header>
+
+        <main>
+            <div class="main-left">
+                <div class="slideshow-container" id="slideshow">
+                    <img src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=1000" class="slide active">
+                </div>
+                <footer class="main-footer">
+                    <marquee id="txt-pengumuman">Menghubungkan ke server Firebase...</marquee>
+                </footer>
+            </div>
+
+            <div class="jadwal-sidebar">
+                <h2>JADWAL SHOLAT</h2>
+                <div class="kartu-sholat" id="row-subuh"><span>SUBUH</span><b id="sholat-subuh">--:--</b></div>
+                <div class="kartu-sholat" id="row-dzuhur"><span>DZUHUR</span><b id="sholat-dzuhur">--:--</b></div>
+                <div class="kartu-sholat" id="row-ashar"><span>ASHAR</span><b id="sholat-ashar">--:--</b></div>
+                <div class="kartu-sholat" id="row-maghrib"><span>MAGHRIB</span><b id="sholat-maghrib">--:--</b></div>
+                <div class="kartu-sholat" id="row-isya"><span>ISYA</span><b id="sholat-isya">--:--</b></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="overlay-adzan">
+        <div class="adzan-card">
+            <h1 class="msg-judul" id="msg-judul">MENJELANG ADZAN</h1>
+            <div id="timer-countdown">00:00</div>
+            <p class="msg-sholat" id="msg-sholat">DZUHUR</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+        // --- 1. KONFIGURASI FIREBASE (GANTI URL INI) ---
+        const firebaseConfig = { databaseURL: "ISI_DENGAN_URL_FIREBASE_ANDA" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let currentSlideIndex = 0;
+        let slideInterval;
+        let jadwalHariIni = {};
+
+        // --- 2. SINKRONISASI DATA REALTIME ---
+        onValue(ref(db, 'konten/'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('txt-nama-masjid').innerText = data.nama_masjid || "NAMA MASJID";
+                document.getElementById('txt-pengumuman').innerText = data.pengumuman || "Selamat Datang";
+                document.getElementById('txt-alamat').innerText = data.alamat || "Alamat";
+                if (data.slides) updateSlideshow(data.slides);
+            }
+        });
+
+        function updateSlideshow(urlStrings) {
+            const container = document.getElementById('slideshow');
+            const urls = urlStrings.split(',').map(url => url.trim()).filter(url => url !== "");
+            clearInterval(slideInterval);
+            container.innerHTML = "";
+            urls.forEach((url, index) => {
+                const img = document.createElement('img');
+                img.src = url; img.className = (index === 0) ? 'slide active' : 'slide';
+                img.onerror = () => img.src = "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=1000";
+                container.appendChild(img);
+            });
+            currentSlideIndex = 0;
+            if (urls.length > 1) {
+                slideInterval = setInterval(() => {
+                    const slides = document.querySelectorAll('.slide');
+                    slides[currentSlideIndex].classList.remove('active');
+                    currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+                    slides[currentSlideIndex].classList.add('active');
+                }, 8000);
+            }
+        }
+
+        // --- 3. JADWAL SHOLAT API ---
+        async function fetchJadwal() {
+            try {
+                const t = new Date();
+                const res = await fetch(`https://api.my-quran.com/v2/sholat/jadwal/1301/${t.getFullYear()}/${t.getMonth()+1}/${t.getDate()}`);
+                const resData = await res.json();
+                jadwalHariIni = resData.data.jadwal;
+                ["subuh", "dzuhur", "ashar", "maghrib", "isya"].forEach(s => {
+                    document.getElementById(`sholat-${s}`).innerText = jadwalHariIni[s];
+                });
+            } catch (e) { console.error("Gagal ambil jadwal"); }
+        }
+        fetchJadwal();
+
+        // --- 4. JAM & LOGIKA ADZAN ---
+        setInterval(() => {
+            const now = new Date();
+            const jamSekarang = now.toLocaleTimeString('id-ID', {hour12: false, hour: '2-digit', minute: '2-digit'});
+            document.getElementById('jam-digital').innerText = now.toLocaleTimeString('id-ID', {hour12: false});
+            
+            cekAdzan(jamSekarang);
+        }, 1000);
+
+        function cekAdzan(jam) {
+            let adzanActive = false;
+            ["subuh", "dzuhur", "ashar", "maghrib", "isya"].forEach(s => {
+                const target = jadwalHariIni[s];
+                if (!target) return;
+                const selisih = hitungMenit(jam, target);
+                const el = document.getElementById(`row-${s}`);
+                el.classList.remove('active');
+
+                if (selisih >= 0 && selisih <= 10) {
+                    el.classList.add('active');
+                    adzanActive = true;
+                    document.getElementById('overlay-adzan').style.display = 'flex';
+                    document.getElementById('timer-countdown').innerText = selisih === 0 ? "ADZAN" : selisih + "m";
+                    document.getElementById('msg-sholat').innerText = s.toUpperCase();
+                    document.getElementById('msg-judul').innerText = selisih === 0 ? "WAKTUNYA" : "MENJELANG ADZAN";
+                }
+            });
+            if (!adzanActive) document.getElementById('overlay-adzan').style.display = 'none';
+        }
+
+        function hitungMenit(skrg, target) {
+            const [h1, m1] = skrg.split(':').map(Number);
+            const [h2, m2] = target.split(':').map(Number);
+            return (h2 * 60 + m2) - (h1 * 60 + m1);
+        }
+
+        // --- 5. AUTO RECOVERY & MAINTENANCE ---
+        window.addEventListener('online', () => location.reload());
+        setInterval(() => {
+            if (new Date().getHours() === 2 && new Date().getMinutes() === 0) location.reload();
+        }, 60000);
+    </script>
+</body>
+</html>
